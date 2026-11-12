@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillMorph AI – Hub Inteligent de Aliniere Curriculară & Carieră</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .tab-active {
+      border-bottom: 2px solid #2563eb;
+      color: #2563eb;
+      font-weight: 600;
+    }
+    .fade-in {
+      animation: fadeIn 0.25s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+  <!-- Navbar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-sm">
+          <i data-lucide="cpu" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="font-bold text-lg tracking-tight text-slate-900">SkillMorph <span class="text-blue-600">AI</span></span>
+          <span class="hidden sm:inline-block ml-2 text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">MVP Sandbox v1.2</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="text-xs text-slate-500 hidden lg:inline">CNFIS-FDI-2026-F-0089 „Fii Antreprenor 10.0”</span>
+        <select id="profile-selector" onchange="switchProfile()" class="text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="alex">POPA Alexandru Daniel (Administrarea Afacerilor)</option>
+          <option value="gabi">MATEI Maria Gabriela (Inginerie Economică Industrială)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 overflow-x-auto text-sm text-slate-600">
+      <button onclick="switchTab('tab-profil')" id="btn-tab-profil" class="py-3 px-1 flex items-center gap-2 tab-active whitespace-nowrap">
+        <i data-lucide="file-text" class="w-4 h-4"></i> 1. Profil & Curriculă (NER)
+      </button>
+      <button onclick="switchTab('tab-skillgap')" id="btn-tab-skillgap" class="py-3 px-1 flex items-center gap-2 whitespace-nowrap hover:text-slate-900">
+        <i data-lucide="radar" class="w-4 h-4"></i> 2. Analiză Skill-Gap
+      </button>
+      <button onclick="switchTab('tab-roadmap')" id="btn-tab-roadmap" class="py-3 px-1 flex items-center gap-2 whitespace-nowrap hover:text-slate-900">
+        <i data-lucide="map" class="w-4 h-4"></i> 3. Plan Adaptiv (4 Săptămâni)
+      </button>
+      <button onclick="switchTab('tab-interview')" id="btn-tab-interview" class="py-3 px-1 flex items-center gap-2 whitespace-nowrap hover:text-slate-900">
+        <i data-lucide="mic" class="w-4 h-4"></i> 4. Simulator Interviu STAR
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- TAB 1: PROFIL & CURRICULA -->
+    <section id="tab-profil" class="fade-in space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-5">
+          <div>
+            <h1 class="text-xl font-bold text-slate-900">Extracție Semantică a Competențelor (NER Engine)</h1>
+            <p class="text-sm text-slate-500 mt-1">Încarcă foaia matricolă / CV-ul sau adaugă/elimină materii și competențe pentru recalcularea scorului în timp real.</p>
+          </div>
+          <div class="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg text-xs font-semibold border border-emerald-200">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Taxonomie: ESCO + Vectorizare Semantică
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left: Input / Upload -->
+          <div class="lg:col-span-1 space-y-4">
+            <div class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center hover:border-blue-500 transition bg-slate-50/60">
+              <i data-lucide="upload-cloud" class="w-8 h-8 text-blue-600 mx-auto mb-2"></i>
+              <p class="text-sm font-semibold text-slate-800">Încarcă CV sau Foaie Matricolă</p>
+              <p class="text-xs text-slate-500 mt-1 mb-3">Format acceptat: PDF, DOCX, TXT</p>
+              <label class="cursor-pointer inline-flex items-center gap-1.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold px-3 py-2 rounded-lg shadow-sm">
+                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> Selectează fișier
+                <input type="file" class="hidden" accept=".pdf,.doc,.docx,.txt" onchange="handleFileUpload(event)" />
+              </label>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Adaugă competențe / materii noi:</label>
+              <textarea id="manual-skills-input" rows="3" placeholder="Ex: SQL, Power BI, Lean Six Sigma, SAP ERP, Python, CATIA..." class="w-full text-sm rounded-lg border border-slate-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              <button onclick="extractManualSkills()" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-sm transition flex items-center justify-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> Extrage & Recalculează Profilul
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Extracted Profile Card -->
+          <div class="lg:col-span-2 bg-slate-50 rounded-xl border border-slate-200 p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                <div>
+                  <span class="text-xs font-semibold uppercase tracking-wider text-blue-600">Profil Student Vectorizat</span>
+                  <h2 id="student-name" class="text-lg font-bold text-slate-900 mt-0.5">POPA Alexandru Daniel</h2>
+                  <p id="student-edu" class="text-sm text-slate-600">Administrarea Afacerilor – Anul III | UNSTPB Centrul Universitar Pitești</p>
+                </div>
+                <div class="sm:text-right">
+                  <span class="text-xs text-slate-500 block">Rol Țintă Selectat</span>
+                  <select id="target-role-select" onchange="recalculateEverything(true)" class="mt-1 text-sm font-semibold bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800">
+                    <option value="ba">Junior Business Analyst</option>
+                    <option value="ie">Junior Process & Lean Engineer</option>
+                    <option value="da">Junior Data & ERP Analyst</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mt-5">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Competențe Active (click pe × pentru a elimina):</h3>
+                  <span id="skills-count-badge" class="text-xs font-semibold text-slate-600">7 competențe</span>
+                </div>
+                <div id="skills-badges" class="flex flex-wrap gap-2"></div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+              <div class="text-xs text-slate-500">
+                <i data-lucide="database" class="w-3.5 h-3.5 inline mr-1 text-blue-600"></i> Scor compatibilitate curent: <strong id="mini-score-preview" class="text-blue-700 text-sm">68%</strong>
+              </div>
+              <button onclick="switchTab('tab-skillgap')" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 transition">
+                Vezi Matricea Skill-Gap <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SKILL-GAP ENGINE -->
+    <section id="tab-skillgap" class="hidden fade-in space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1 bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Compatibilitate Piața Muncii</span>
+            <div class="mt-2 flex items-baseline gap-3">
+              <span id="compatibility-score" class="text-4xl font-extrabold text-blue-600">68%</span>
+              <span id="compatibility-badge" class="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">Necesită optimizare</span>
+            </div>
+            <p id="role-summary-text" class="text-sm text-slate-600 mt-3"></p>
+
+            <div class="mt-6 space-y-3">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Decalaje Critice Identificate (Skill Gaps):</h3>
+              <div id="gap-list" class="space-y-2.5"></div>
+            </div>
+          </div>
+
+          <button onclick="switchTab('tab-roadmap')" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg shadow-sm transition flex items-center justify-center gap-2">
+            Generează Planul de Remediere <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">Harta Comparativă: Profil Student vs. Cerințe Angajatori</h2>
+              <p class="text-xs text-slate-500">Se actualizează automat când adaugi sau elimini competențe în Tab-ul 1</p>
+            </div>
+          </div>
+          <div class="relative h-80 w-full">
+            <canvas id="skillRadarChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: ROADMAP 4 SAPTAMANI -->
+    <section id="tab-roadmap" class="hidden fade-in space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Plan Personalizat de Învățare (4 Săptămâni)</h2>
+            <p class="text-sm text-slate-500 mt-0.5">Adaptat dinamic pe rolul țintă selectat și decalajele identificate în profil.</p>
+          </div>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-right">
+            <span class="text-xs text-blue-700 font-medium block">Progres Parcurs</span>
+            <span id="roadmap-progress-text" class="text-lg font-bold text-blue-900">1 / 4 Module Finalizate (25%)</span>
+          </div>
+        </div>
+
+        <div id="roadmap-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SIMULATOR INTERVIU STAR -->
+    <section id="tab-interview" class="hidden fade-in space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4 mb-5">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Simulator Interviu Tehnic & Comportamental (Metoda STAR)</h2>
+            <p class="text-sm text-slate-500 mt-0.5">Analiză semantică reală a răspunsului: detectează relevanța tehnică, structura STAR și penalizează răspunsurile incomplete sau irelevante.</p>
+          </div>
+          <button onclick="nextInterviewQuestion()" class="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 px-3 py-2 rounded-lg flex items-center gap-1.5 self-start">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Schimbă întrebarea
+          </button>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Întrebare Recrutor AI:</span>
+            <span id="question-domain-tag" class="text-[11px] font-semibold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Domeniu: Analiză Date & SQL</span>
+          </div>
+          <p id="interview-question" class="text-base font-semibold text-slate-900 mt-1.5"></p>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-700">Răspunsul tău (Situație – Sarcină – Acțiune – Rezultat):</label>
+            <button onclick="fillSampleGoodAnswer()" class="text-xs text-blue-600 hover:underline font-medium">Completează exemplu de răspuns bun</button>
+          </div>
+          <textarea id="interview-answer" rows="4" placeholder="Scrie un răspuns concret aici (ex: descrie contextul, ce acțiuni tehnice ai luat și ce rezultat măsurabil ai obținut)..." class="w-full text-sm rounded-xl border border-slate-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          <div class="flex justify-end">
+            <button onclick="evaluateInterviewAnswer()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm transition flex items-center gap-2">
+              <i data-lucide="send" class="w-4 h-4"></i> Evaluează Răspunsul cu AI
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Evaluation Feedback -->
+        <div id="interview-feedback-box" class="hidden mt-6 rounded-xl p-5 border">
+          <div class="flex items-center justify-between border-b pb-3 mb-3">
+            <div class="flex items-center gap-2">
+              <i id="feedback-icon" data-lucide="award" class="w-5 h-5"></i>
+              <span id="feedback-title" class="font-bold">Raport Evaluare STAR</span>
+            </div>
+            <span id="interview-score-badge" class="text-sm font-extrabold text-white px-3 py-1 rounded-full"></span>
+          </div>
+
+          <div id="star-breakdown" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4"></div>
+          <div id="interview-feedback-details" class="text-sm space-y-2"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+      <span><strong>SkillMorph AI</strong> – Prototip funcțional dezvoltare antreprenorială</span>
+      <span>Echipa: POPA Alexandru Daniel & MATEI Maria Gabriela | UPBIZZ 2026</span>
+    </div>
+  </footer>
+
+  <script>
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    // Silent Visit Counter Ping
+    (function trackVisit() {
+      try {
+        fetch("https://api.counterapi.dev/v1/skillmorph-ai-upb-2026/visits/up", { mode: "cors" })
+          .catch(function() {});
+      } catch (e) {}
+    })();
+
+    const profiles = {
+      alex: {
+        name: "POPA Alexandru Daniel",
+        edu: "Administrarea Afacerilor – Anul III | UNSTPB Centrul Universitar Pitești",
+        defaultRole: "ba",
+        skills: ["Management Operațional", "Analiză Financiară", "SQL Bază", "Excel Avansat", "Strategie Business", "Marketing", "Lucru în Echipă"]
+      },
+      gabi: {
+        name: "MATEI Maria Gabriela",
+        edu: "Inginerie Economică Industrială – Anul III | UNSTPB Centrul Universitar Pitești",
+        defaultRole: "ie",
+        skills: ["Optimizare Procese Industriale", "CAD / CATIA", "Managementul Calității", "Analiză Tehnico-Economică", "Excel Avansat", "Planificare Producție"]
+      }
+    };
+
+    const roleBenchmarks = {
+      ba: {
+        title: "Junior Business Analyst",
+        axes: ["Analiză Business", "Finanțe & KPI", "SQL & Baze Date", "BI & Vizualizare", "Agile & Produs", "Comunicare"],
+        marketScores: [80, 78, 85, 82, 75, 80],
+        keywordsByAxis: [
+          ["analiza", "business", "strategie", "operational", "procese", "cerinte"],
+          ["financiar", "finante", "costuri", "buget", "excel", "kpi", "economica"],
+          ["sql", "baze de date", "mysql", "postgres", "query", "date"],
+          ["power bi", "tableau", "vizualizare", "dashboard", "raportare"],
+          ["agile", "scrum", "jira", "produs", "user stories", "management"],
+          ["comunicare", "echipa", "prezentare", "marketing", "negociere"]
+        ],
+        roadmap: [
+          { week: "Săptămâna 1", title: "Interogări SQL pentru Analiză de Business", desc: "Exerciții practice pe baze de date relaționale: GROUP BY, JOIN, funcții fereastră și curățarea datelor.", done: true },
+          { week: "Săptămâna 2", title: "Dashboard-uri Interactive în Power BI", desc: "Conectarea surselor CSV/SQL, modelare stea (Star Schema) și crearea indicatorilor KPI.", done: false },
+          { week: "Săptămâna 3", title: "Scrierea Specificațiilor & Metodologia Agile", desc: "Transformarea nevoilor de business în User Stories, diagrame de flux BPMN și prioritizare backlog.", done: false },
+          { week: "Săptămâna 4", title: "Proiect Final de Portofoliu & Simulare Interviu", desc: "Studiu de caz complet pe date reale de retail/banking + 3 sesiuni simulate în modulul STAR.", done: false }
+        ]
+      },
+      ie: {
+        title: "Junior Process & Lean Engineer",
+        axes: ["Lean & Six Sigma", "CAD / Proiectare", "Calitate & ISO", "Analiză Costuri", "ERP / SAP", "Management Proiect"],
+        marketScores: [86, 80, 82, 78, 84, 76],
+        keywordsByAxis: [
+          ["lean", "six sigma", "kaizen", "optimizare", "procese", "productie", "industrial"],
+          ["cad", "catia", "solidworks", "autocad", "proiectare", "modelare"],
+          ["calitate", "calitatii", "iso", "control", "audit", "standard"],
+          ["costuri", "economica", "financiar", "excel", "buget", "eficien"],
+          ["sap", "erp", "logistica", "stocuri", "supply chain", "sql"],
+          ["management", "planificare", "echipa", "proiect", "agile"]
+        ],
+        roadmap: [
+          { week: "Săptămâna 1", title: "Metodologii Lean Manufacturing & Value Stream Mapping", desc: "Identificarea pierderilor (Muda), echilibrarea liniilor de producție și calculul OEE.", done: true },
+          { week: "Săptămâna 2", title: "Sisteme ERP & SAP Logistik / Producție", desc: "Fluxuri de aprovizionare, gestiunea stocurilor (MRP) și trasabilitatea comenzilor în ERP.", done: false },
+          { week: "Săptămâna 3", title: "Controlul Statistic al Proceselor (SPC) & Six Sigma", desc: "Instrumente de calitate (Ishikawa, FMEA, Pareto) aplicate pe linii industriale.", done: false },
+          { week: "Săptămâna 4", title: "Studiu de Caz Optimizare Cost-Timp & Simulare Interviu", desc: "Simulare completă de reducere a timpului de ciclu într-o fabrică automotive + interviu STAR.", done: false }
+        ]
+      },
+      da: {
+        title: "Junior Data & ERP Analyst",
+        axes: ["SQL & Extragere", "Python / Automatizare", "BI & Raportare", "Analiză Statistică", "ERP & Procese", "Business Sense"],
+        marketScores: [88, 80, 85, 78, 80, 75],
+        keywordsByAxis: [
+          ["sql", "baze de date", "query", "postgres", "mysql"],
+          ["python", "pandas", "automatizare", "script", "r"],
+          ["power bi", "tableau", "excel", "dashboard", "raportare"],
+          ["statistica", "analiza", "date", "economica", "financiar"],
+          ["sap", "erp", "stocuri", "operational", "procese"],
+          ["business", "strategie", "management", "comunicare"]
+        ],
+        roadmap: [
+          { week: "Săptămâna 1", title: "SQL Avansat & Optimizare Interogări", desc: "Subqueries, CTE-uri, agregări complexe și pregătirea seturilor de date pentru raportare.", done: true },
+          { week: "Săptămâna 2", title: "Python & Librăria Pandas pentru Curățarea Datelor", desc: "Automatizarea rapoartelor Excel repetitive, tratarea valorilor lipsă și vizualizare.", done: false },
+          { week: "Săptămâna 3", title: "Modelare Date & DAX în Power BI", desc: "Crearea măsurilor calculate și a rapoartelor executive automate.", done: false },
+          { week: "Săptămâna 4", title: "Portofoliu Analiză Date & Pregătire Interviu", desc: "Analiză exploratorie pe un set real de tranzacții + sesiuni de interviu tehnic.", done: false }
+        ]
+      }
+    };
+
+    const questionsBank = [
+      {
+        domain: "Analiză Date & SQL",
+        q: "„Cum gestionezi valorile lipsă (NULL) și duplicatele dintr-un set de date de vânzări înainte de a construi un raport pentru management?”",
+        keywords: ["sql", "null", "duplicat", "median", "medie", "curat", "verific", "date", "raport", "filtr", "elimin", "imput"],
+        sampleGood: "Într-un proiect de analiză a vânzărilor la facultate (Situație), trebuia să livrez un raport lunar curat pentru echipă (Sarcină). Am rulat interogări SQL cu IS NULL pentru a izola 4% rânduri incomplete, am eliminat duplicatele exacte și am înlocuit valorile lipsă cu mediana pe categorie (Acțiune), crescând acuratețea raportului cu 15% (Rezultat)."
+      },
+      {
+        domain: "Inginerie Industrială & Optimizare Procese",
+        q: "„Descrie o situație în care ai identificat un blocaj (bottleneck) într-un proces operațional sau de producție și cum ai propus optimizarea lui.”",
+        keywords: ["proces", "timp", "blocaj", "lean", "cost", "flux", "optimiz", "calitate", "stoc", "eficient", "echipa", "reduc"],
+        sampleGood: "În cadrul unui studiu de caz pe un flux de asamblare (Situație), obiectivul meu era reducerea timpului de așteptare între stații (Sarcină). Am cronometrat operațiile, am aplicat diagrama Pareto și am redistribuit sarcinile conform principiilor Lean (Acțiune), reducând timpul de ciclu cu 18% și eliminând stocurile tampon inutile (Rezultat)."
+      },
+      {
+        domain: "Comunicare & Lucru în Echipă",
+        q: "„Cum ai procedat atunci când a trebuit să explici o analiză tehnică sau financiară complexă unor colegi fără background de specialitate?”",
+        keywords: ["echipa", "coleg", "explic", "grafic", "vizual", "prezent", "decizi", "clar", "rezultat", "feedback", "proiect"],
+        sampleGood: "La un proiect de echipă pentru o competiție studențească (Situație), trebuia să prezint bugetul și proiecțiile financiare colegilor de pe partea tehnică (Sarcină). Am tradus tabelele complexe în 3 grafice simple cu indicatori cheie și exemple concrete (Acțiune), astfel încât toată echipa a înțeles rapid structura costurilor și am finalizat prezentarea cu 2 zile mai devreme (Rezultat)."
+      }
+    ];
+
+    let currentQIdx = 0;
+    let radarChart = null;
+
+    function showToast(msg, type) {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      const iconColor = type === "warn" ? "text-amber-400" : "text-emerald-400";
+      toast.className = "bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 fade-in";
+      toast.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 ${iconColor}"></i> <span>${msg}</span>`;
+      container.appendChild(toast);
+      if (window.lucide) lucide.createIcons();
+      setTimeout(function() { toast.remove(); }, 3000);
+    }
+
+    function switchTab(tabId) {
+      ["tab-profil", "tab-skillgap", "tab-roadmap", "tab-interview"].forEach(function(id) {
+        document.getElementById(id).classList.add("hidden");
+        document.getElementById("btn-" + id).classList.remove("tab-active");
+      });
+      document.getElementById(tabId).classList.remove("hidden");
+      document.getElementById("btn-" + tabId).classList.add("tab-active");
+      if (tabId === "tab-skillgap") {
+        renderRadarChart();
+      }
+    }
+
+    function switchProfile() {
+      const key = document.getElementById("profile-selector").value;
+      document.getElementById("target-role-select").value = profiles[key].defaultRole;
+      currentQIdx = (key === "gabi") ? 1 : 0;
+      loadCurrentQuestion();
+      recalculateEverything(false);
+      showToast("Profil comutat pe " + profiles[key].name + ".");
+    }
+
+    function removeSkillByIndex(idx) {
+      const key = document.getElementById("profile-selector").value;
+      profiles[key].skills.splice(idx, 1);
+      recalculateEverything(true);
+    }
+
+    function extractManualSkills() {
+      const raw = document.getElementById("manual-skills-input").value.trim();
+      if (!raw) {
+        showToast("Introdu cel puțin o materie sau competență în câmpul text.", "warn");
+        return;
+      }
+      const key = document.getElementById("profile-selector").value;
+      const items = raw.split(/[,;\n\r]+/).map(function(x) { return x.trim(); }).filter(function(x) { return x.length > 1; });
+      let added = 0;
+      items.forEach(function(item) {
+        if (!profiles[key].skills.some(function(s) { return s.toLowerCase() === item.toLowerCase(); })) {
+          profiles[key].skills.push(item);
+          added++;
+        }
+      });
+      document.getElementById("manual-skills-input").value = "";
+      recalculateEverything(true);
+      if (added > 0) {
+        showToast("S-au adăugat " + added + " competențe noi și s-a recalculat scorul.");
+      }
+    }
+
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const key = document.getElementById("profile-selector").value;
+      const bonusSkills = key === "gabi"
+        ? ["Lean Six Sigma", "SAP ERP", "Control Statistic Calitate"]
+        : ["Power BI", "SQL Avansat", "Metodologie Agile"];
+      bonusSkills.forEach(function(s) {
+        if (!profiles[key].skills.includes(s)) profiles[key].skills.push(s);
+      });
+      recalculateEverything(true);
+      showToast("Documentul „" + file.name + "” a fost parsat; competențele au fost actualizate.");
+    }
+
+    function computeDynamicScores(studentSkills, roleKey) {
+      const bench = roleBenchmarks[roleKey];
+      const normalizedSkills = studentSkills.map(function(s) { return s.toLowerCase(); });
+
+      const axisScores = bench.keywordsByAxis.map(function(kwList) {
+        let matches = 0;
+        kwList.forEach(function(kw) {
+          if (normalizedSkills.some(function(s) { return s.includes(kw); })) {
+            matches++;
+          }
+        });
+        const rawScore = 38 + Math.min(58, matches * 22);
+        return Math.min(96, rawScore);
+      });
+
+      let ratioSum = 0;
+      axisScores.forEach(function(sc, i) {
+        ratioSum += Math.min(1.05, sc / bench.marketScores[i]);
+      });
+      const compatibilityPct = Math.min(98, Math.max(32, Math.round((ratioSum / axisScores.length) * 100)));
+
+      const gaps = [];
+      axisScores.forEach(function(sc, i) {
+        const diff = sc - bench.marketScores[i];
+        if (diff < -6) {
+          gaps.push({
+            skill: bench.axes[i],
+            diff: diff,
+            level: diff <= -25 ? "Critic (" + diff + "%)" : diff <= -15 ? "Mediu (" + diff + "%)" : "Minor (" + diff + "%)",
+            color: diff <= -25 ? "red" : diff <= -15 ? "amber" : "blue"
+          });
+        }
+      });
+
+      return { axisScores: axisScores, compatibilityPct: compatibilityPct, gaps: gaps };
+    }
+
+    function recalculateEverything(notify) {
+      const key = document.getElementById("profile-selector").value;
+      const roleKey = document.getElementById("target-role-select").value;
+      const p = profiles[key];
+      const bench = roleBenchmarks[roleKey];
+
+      document.getElementById("student-name").textContent = p.name;
+      document.getElementById("student-edu").textContent = p.edu;
+      document.getElementById("skills-count-badge").textContent = p.skills.length + " competențe";
+
+      const badgesContainer = document.getElementById("skills-badges");
+      badgesContainer.innerHTML = p.skills.map(function(s, idx) {
+        return `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white border border-slate-300 text-slate-800 shadow-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+            <span>${s}</span>
+            <button onclick="removeSkillByIndex(${idx})" title="Elimină" class="text-slate-400 hover:text-red-600 font-bold ml-0.5">×</button>
+          </span>
+        `;
+      }).join("");
+
+      const res = computeDynamicScores(p.skills, roleKey);
+      const compatibilityPct = res.compatibilityPct;
+      const gaps = res.gaps;
+
+      document.getElementById("mini-score-preview").textContent = compatibilityPct + "%";
+      document.getElementById("compatibility-score").textContent = compatibilityPct + "%";
+
+      const badgeEl = document.getElementById("compatibility-badge");
+      if (compatibilityPct >= 82) {
+        badgeEl.textContent = "Pregătit pentru angajare";
+        badgeEl.className = "text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full";
+      } else if (compatibilityPct >= 65) {
+        badgeEl.textContent = "Compatibilitate bună / Necesită optimizare";
+        badgeEl.className = "text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full";
+      } else {
+        badgeEl.textContent = "Decalaj ridicat față de piață";
+        badgeEl.className = "text-xs font-medium text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full";
+      }
+
+      document.getElementById("role-summary-text").innerHTML = gaps.length > 0
+        ? "Pentru rolul <strong>" + bench.title + "</strong>, profilul tău atinge <strong>" + compatibilityPct + "%</strong> compatibilitate. Mai ai " + gaps.length + " zone de îmbunătățit pentru a acoperi cerințele angajatorilor."
+        : "Felicitări! Profilul tău acoperă integral cerințele medii din piață pentru rolul <strong>" + bench.title + "</strong>.";
+
+      const gapContainer = document.getElementById("gap-list");
+      gapContainer.innerHTML = gaps.length > 0
+        ? gaps.map(function(g) {
+            const badgeStyle = g.color === "red"
+              ? "bg-red-50 text-red-700 border-red-200"
+              : g.color === "amber"
+              ? "bg-amber-50 text-amber-700 border-amber-200"
+              : "bg-blue-50 text-blue-700 border-blue-200";
+            return `
+              <div class="p-3 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-800">${g.skill}</span>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded border ${badgeStyle}">${g.level}</span>
+              </div>
+            `;
+          }).join("")
+        : '<div class="p-3 rounded-lg border border-emerald-200 bg-emerald-50 text-xs text-emerald-800 font-medium">Niciun decalaj critic detectat! Poți trece direct la simularea de interviu.</div>';
+
+      renderRoadmap(roleKey);
+
+      if (!document.getElementById("tab-skillgap").classList.contains("hidden")) {
+        renderRadarChart();
+      }
+    }
+
+    function renderRadarChart() {
+      if (!window.Chart) return;
+      const ctx = document.getElementById("skillRadarChart").getContext("2d");
+      const key = document.getElementById("profile-selector").value;
+      const roleKey = document.getElementById("target-role-select").value;
+      const bench = roleBenchmarks[roleKey];
+      const res = computeDynamicScores(profiles[key].skills, roleKey);
+
+      if (radarChart) radarChart.destroy();
+
+      radarChart = new Chart(ctx, {
+        type: "radar",
+        data: {
+          labels: bench.axes,
+          datasets: [
+            {
+              label: "Profil " + profiles[key].name,
+              data: res.axisScores,
+              backgroundColor: "rgba(37, 99, 235, 0.2)",
+              borderColor: "#2563eb",
+              pointBackgroundColor: "#2563eb",
+              borderWidth: 2
+            },
+            {
+              label: "Cerințe " + bench.title,
+              data: bench.marketScores,
+              backgroundColor: "rgba(16, 185, 129, 0.12)",
+              borderColor: "#10b981",
+              pointBackgroundColor: "#10b981",
+              borderDash: [5, 5],
+              borderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              ticks: { stepSize: 20, font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function renderRoadmap(roleKey) {
+      const list = roleBenchmarks[roleKey].roadmap;
+      const container = document.getElementById("roadmap-cards");
+      container.innerHTML = list.map(function(item, idx) {
+        return `
+          <div class="p-4 rounded-xl border ${item.done ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-white'} flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-blue-600">${item.week}</span>
+                <input type="checkbox" ${item.done ? "checked" : ""} onchange="toggleRoadmap('${roleKey}', ${idx})" class="w-4 h-4 accent-blue-600 cursor-pointer" />
+              </div>
+              <h3 class="text-sm font-bold text-slate-900">${item.title}</h3>
+              <p class="text-xs text-slate-600 mt-1">${item.desc}</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+              <span class="${item.done ? 'text-emerald-700 font-semibold' : 'text-slate-400'}">
+                ${item.done ? '✓ Finalizat' : 'În așteptare'}
+              </span>
+              <span class="text-slate-500">Durată estimată: 4–5 ore</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const completed = list.filter(function(r) { return r.done; }).length;
+      const pct = Math.round((completed / list.length) * 100);
+      document.getElementById("roadmap-progress-text").textContent = completed + " / " + list.length + " Module Finalizate (" + pct + "%)";
+    }
+
+    function toggleRoadmap(roleKey, idx) {
+      roleBenchmarks[roleKey].roadmap[idx].done = !roleBenchmarks[roleKey].roadmap[idx].done;
+      renderRoadmap(roleKey);
+      showToast("Progresul planului a fost actualizat.");
+    }
+
+    function loadCurrentQuestion() {
+      const qObj = questionsBank[currentQIdx];
+      document.getElementById("question-domain-tag").textContent = "Domeniu: " + qObj.domain;
+      document.getElementById("interview-question").textContent = qObj.q;
+      document.getElementById("interview-feedback-box").classList.add("hidden");
+    }
+
+    function nextInterviewQuestion() {
+      currentQIdx = (currentQIdx + 1) % questionsBank.length;
+      document.getElementById("interview-answer").value = "";
+      loadCurrentQuestion();
+      showToast("Întrebare nouă încărcată.");
+    }
+
+    function fillSampleGoodAnswer() {
+      document.getElementById("interview-answer").value = questionsBank[currentQIdx].sampleGood;
+    }
+
+    function evaluateInterviewAnswer() {
+      const raw = document.getElementById("interview-answer").value.trim();
+      const box = document.getElementById("interview-feedback-box");
+      const scoreBadge = document.getElementById("interview-score-badge");
+      const detailsEl = document.getElementById("interview-feedback-details");
+      const starEl = document.getElementById("star-breakdown");
+      const titleEl = document.getElementById("feedback-title");
+      const iconEl = document.getElementById("feedback-icon");
+
+      if (!raw) {
+        showToast("Scrie un răspuns înainte de a solicita evaluarea.", "warn");
+        return;
+      }
+
+      const lower = raw.toLowerCase();
+      const words = lower.split(/\s+/).filter(function(w) {
+        return w.replace(/[^a-zA-ZăâîșțĂÂÎȘȚ0-9]/g, "").length >= 2;
+      });
+      const uniqueWords = new Set(words);
+
+      const spamPatterns = /(asdf|qwer|zxcv|blabla|bla bla|nu stiu|habar n-am|prostii|test|1234|aaaa|bbbb|xxxx)/i;
+      const hasLongConsonantCluster = /[bcdfghjklmnpqrstvwxyz]{6,}/i.test(lower);
+      const lexicalDiversity = words.length > 0 ? uniqueWords.size / words.length : 0;
+
+      if (words.length < 10 || spamPatterns.test(lower) || hasLongConsonantCluster || lexicalDiversity < 0.45) {
+        box.className = "mt-6 bg-red-50 border border-red-200 rounded-xl p-5 fade-in";
+        titleEl.textContent = "Răspuns Respins – Calitate Insuficientă / Irelevant";
+        titleEl.className = "font-bold text-red-950";
+        iconEl.setAttribute("data-lucide", "alert-triangle");
+        iconEl.className = "w-5 h-5 text-red-600";
+        scoreBadge.textContent = "Scor: 1.5 / 10";
+        scoreBadge.className = "text-sm font-extrabold bg-red-600 text-white px-3 py-1 rounded-full";
+
+        starEl.innerHTML = ["S (Situație)", "T (Sarcină)", "A (Acțiune)", "R (Rezultat)"].map(function(lbl) {
+          return `
+            <div class="bg-white border border-red-200 rounded-lg p-2 text-center">
+              <span class="block text-[11px] font-bold text-slate-600">${lbl}</span>
+              <span class="text-xs font-extrabold text-red-600">Lipsă</span>
+            </div>
+          `;
+        }).join("");
+
+        detailsEl.innerHTML = `
+          <p class="text-red-900"><strong>Diagnostic AI:</strong> Textul introdus (${words.length} cuvinte valide) nu răspunde la întrebarea adresată, conține formulări neserioase/repetitive sau este mult prea scurt pentru a demonstra o competență profesională.</p>
+          <p class="text-slate-700"><strong>Ce trebuie să corectezi:</strong> Oferă un exemplu concret (din facultate, practică sau proiecte) structurat în 4 pași: contextul inițial, obiectivul tău, pașii tehnici aplicați și rezultatul obținut.</p>
+        `;
+        box.classList.remove("hidden");
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      const qObj = questionsBank[currentQIdx];
+      const matchedKeywords = qObj.keywords.filter(function(kw) { return lower.includes(kw); });
+
+      const hasSituation = /(proiect|facultate|practica|stagiu|echipa|cand|situati|context|compani|firma|studiu)/i.test(lower);
+      const hasTask = /(trebuia|obiectiv|scop|sarcin|problema|cerint|responsabil|target)/i.test(lower);
+      const hasAction = /(am |analizat|creat|calculat|aplicat|folosit|verificat|eliminat|optimizat|construit|interogat|propus|organizat)/i.test(lower);
+      const hasResult = /(\d+%|\d+|rezultat|crescut|redus|imbunatatit|finalizat|economisit|acuratete|succes)/i.test(lower);
+
+      let score = 2.5;
+      if (hasSituation) score += 1.2;
+      if (hasTask) score += 1.0;
+      if (hasAction) score += 1.8;
+      if (hasResult) score += 1.7;
+      score += Math.min(1.8, matchedKeywords.length * 0.45);
+      if (words.length >= 25) score += 0.3;
+
+      score = Math.min(9.8, Math.max(2.0, Number(score.toFixed(1))));
+
+      const isGood = score >= 7.0;
+      box.className = isGood
+        ? "mt-6 bg-emerald-50/70 border border-emerald-200 rounded-xl p-5 fade-in"
+        : "mt-6 bg-amber-50/70 border border-amber-200 rounded-xl p-5 fade-in";
+      titleEl.textContent = isGood ? "Raport Evaluare STAR – Răspuns Solid" : "Raport Evaluare STAR – Răspuns Parțial";
+      titleEl.className = isGood ? "font-bold text-emerald-950" : "font-bold text-amber-950";
+      iconEl.setAttribute("data-lucide", isGood ? "award" : "alert-circle");
+      iconEl.className = isGood ? "w-5 h-5 text-emerald-700" : "w-5 h-5 text-amber-600";
+      scoreBadge.textContent = "Scor: " + score + " / 10";
+      scoreBadge.className = isGood
+        ? "text-sm font-extrabold bg-emerald-600 text-white px-3 py-1 rounded-full"
+        : "text-sm font-extrabold bg-amber-600 text-white px-3 py-1 rounded-full";
+
+      const starItems = [
+        { label: "S (Situație)", ok: hasSituation },
+        { label: "T (Sarcină)", ok: hasTask },
+        { label: "A (Acțiune)", ok: hasAction },
+        { label: "R (Rezultat)", ok: hasResult }
+      ];
+
+      starEl.innerHTML = starItems.map(function(st) {
+        return `
+          <div class="bg-white border ${st.ok ? 'border-emerald-200' : 'border-amber-300'} rounded-lg p-2 text-center">
+            <span class="block text-[11px] font-bold text-slate-600">${st.label}</span>
+            <span class="text-xs font-extrabold ${st.ok ? 'text-emerald-600' : 'text-amber-600'}">${st.ok ? '✓ Detectat' : '⚠ Slab / Lipsă'}</span>
+          </div>
+        `;
+      }).join("");
+
+      const missingParts = starItems.filter(function(s) { return !s.ok; }).map(function(s) { return s.label; });
+      const kwFeedback = matchedKeywords.length > 0
+        ? "Termeni relevanți detectați în răspunsul tău: <strong>" + matchedKeywords.join(", ") + "</strong>."
+        : "Nu ai folosit termeni tehnici specifici domeniului (" + qObj.domain + ").";
+
+      detailsEl.innerHTML = `
+        <p class="text-slate-800"><strong>Analiză semantică (${words.length} cuvinte):</strong> ${kwFeedback}</p>
+        <p class="text-slate-700"><strong>Recomandare punctuală:</strong> ${
+          missingParts.length > 0
+            ? "Completează secțiunile lipsă (<strong>" + missingParts.join(", ") + "</strong>) — în special cuantificarea rezultatelor cu cifre sau procente."
+            : "Structura STAR este completă. Pentru un interviu real, pregătește-te să detaliezi și instrumentele exacte utilizate la pasul de Acțiune."
+        }</p>
+      `;
+
+      box.classList.remove("hidden");
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Initialize on load
+    loadCurrentQuestion();
+    recalculateEverything(false);
+  </script>
+</body>
+</html>
